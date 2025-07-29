@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛒 مشترياتي</title>
+<style>
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center;}
+header { background:#007bff; color:#fff; padding:8px; overflow:hidden; }
+.marquee { display:inline-block; white-space:nowrap; animation:scroll-left 10s linear infinite; font-size:15px;}
+@keyframes scroll-left { 0% {transform:translateX(100%);} 100% {transform:translateX(-100%);} }
+nav { background:#f8f9fa; display:flex; justify-content:space-around; padding:8px 0; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+nav a { text-decoration:none; color:#333; font-size:14px;}
+nav a:hover { color:#007bff; }
+section { margin:10px auto; width:95%; max-width:800px;}
+.item { border:1px solid #ddd; border-radius:6px; margin:5px 0; padding:8px; text-align:right;}
+.item img { width:80px; height:80px; object-fit:cover; border-radius:4px; float:right; margin-left:8px;}
+.item-details { overflow:hidden; }
+button.cancelBtn { background:#dc3545; color:#fff; border:none; padding:4px 8px; font-size:13px; border-radius:4px; cursor:pointer; margin-top:4px;}
+button.cancelBtn:hover { background:#c82333;}
+.total { font-size:15px; font-weight:bold; margin-top:10px; }
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; border-top:1px solid #ddd; margin-top:10px; clear:both;}
+.clearfix::after {content:""; clear:both; display:table;}
+</style>
+</head>
+<body>
+
+<header>
+<span class="marquee" id="userMarquee">... جاري التحميل ...</span>
+</header>
+
+<nav>
+  <a href="index.html">🏪 المتجر</a>
+  <a href="myPurchases.html">🛒 مشترياتي</a>
+  <a href="register.html">🔑 حسابي</a>
+</nav>
+
+<section>
+  <div id="purchasesContainer">⏳ جاري التحميل...</div>
+  <div class="total" id="totalPaid">💰 الإجمالي: 0 جنيه</div>
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+let logged=JSON.parse(localStorage.getItem('loggedUser'));
+let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+
+if(!logged || logged.role!=="user"){
+  alert("⚠️ يجب تسجيل الدخول أولاً.");
+  location.href="register.html";
+}else{
+  document.getElementById('userMarquee').textContent= `👤 ${logged.name}`;
+  loadAndRender();
+}
+
+async function loadAndRender(){
+  try{
+    let res=await fetch('products.json');
+    let products=await res.json();
+
+    let userPurchases=purchases.filter(p=>p.phone===logged.phone);
+    let totalPaid=0;
+
+    let html="";
+    userPurchases.forEach((p)=>{
+      let prod=products.find(prod=>prod.name===p.product || prod.name===p.name);
+      let timestamp=Number(p.timestamp);
+      let lastTime = isNaN(timestamp) ? p.timestamp : new Date(timestamp).toLocaleString('ar-EG');
+      totalPaid+=p.price*p.qty;
+
+      html+=`
+      <div class="item clearfix">
+        <img src="${prod?.img || p.image || 'https://via.placeholder.com/80'}" alt="${prod?.name || p.product || p.name}">
+        <div class="item-details">
+          <div><b>${prod?.name || p.product || p.name}</b></div>
+          <div>📅 التاريخ: ${lastTime}</div>
+          <div>💰 السعر: ${p.price} × ${p.qty} = ${p.price*p.qty} جنيه</div>
+          <button class="cancelBtn" onclick="cancelPurchase('${p.timestamp}')">إلغاء الشراء</button>
+        </div>
+      </div>`;
+    });
+
+    document.getElementById('purchasesContainer').innerHTML=html || "📦 لم يتم شراء منتجات بعد.";
+    document.getElementById("totalPaid").textContent= `💰 الإجمالي: ${totalPaid} جنيه`;
+  }catch(e){
+    document.getElementById('purchasesContainer').innerHTML="⚠️ تعذر تحميل السلع.";
+  }
+}
+
+function cancelPurchase(timestamp){
+  let purchases=JSON.parse(localStorage.getItem('purchases')||"[]");
+  let removed=purchases.find(p=>String(p.timestamp)===String(timestamp));
+
+  // إزالة من المشتريات
+  purchases=purchases.filter(p=>String(p.timestamp)!==String(timestamp));
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+
+  // إرسال إلغاء الشراء إلى Formspree
+  if(removed){
+    fetch("https://formspree.io/f/xovldbwb", {
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type: "cancel",
+        name: logged.name,
+        phone: logged.phone,
+        code: logged.code,
+        product: removed.product,
+        qty: removed.qty,
+        price: removed.price,
+        timestamp: removed.timestamp
+      })
+    });
+  }
+
+  alert("✅ تم إلغاء الشراء بنجاح.");
+  location.reload();
+}
+</script>
+
+</body>
+</html>

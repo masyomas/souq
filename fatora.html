@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧾 مطابقة الفاتورة</title>
+<style>
+  body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; text-align:center; }
+  header { background:#007bff; color:#fff; padding:12px; font-size:20px; }
+  section { margin:20px auto; width:90%; max-width:600px; }
+  select, button, textarea { width:90%; padding:8px; margin:8px 0; font-size:15px; border:1px solid #ccc; border-radius:4px; }
+  button { background:#28a745; color:#fff; cursor:pointer; }
+  button:hover { background:#218838; }
+  #totalBox { margin-top:10px; font-size:17px; font-weight:bold; color:#333; }
+  footer { background:#f1f1f1; padding:8px; font-size:13px; color:#777; margin-top:10px; }
+</style>
+</head>
+<body>
+
+<header>🧾 مطابقة الفاتورة</header>
+
+<section>
+  <label for="clientCode">اختر كود العميل:</label>
+  <select id="clientCode">
+    <option value="">-- اختر --</option>
+  </select>
+
+  <button onclick="matchInvoice()">📋 مطابقة الفاتورة</button>
+
+  <textarea id="invoiceBox" rows="8" readonly placeholder="ستظهر هنا أسماء السلع المشتراة..."></textarea>
+  
+  <div id="totalBox">💰 الإجمالي: 0 جنيه</div>
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+  // تحميل الأكواد من المستخدمين المسجلين
+  let users = JSON.parse(localStorage.getItem('users') || '[]');
+  let purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+
+  let select = document.getElementById('clientCode');
+
+  users.forEach(u => {
+    if(u.code) {
+      let opt = document.createElement('option');
+      opt.value = u.code;
+      opt.text = `${u.name} - كود: ${u.code}`;
+      select.appendChild(opt);
+    }
+  });
+
+  function matchInvoice(){
+    let code = document.getElementById('clientCode').value;
+    if(!code){ alert('⚠️ اختر كود العميل أولاً'); return; }
+
+    let userPurchases = purchases.filter(p => p.code == code);
+    if(userPurchases.length == 0){
+      document.getElementById('invoiceBox').value = "📦 لا توجد مشتريات لهذا العميل.";
+      document.getElementById('totalBox').textContent = "💰 الإجمالي: 0 جنيه";
+      return;
+    }
+
+    let result = "";
+    let total = 0;
+    userPurchases.forEach(p => {
+      let qty = parseInt(p.qty) || 1;
+      let price = parseFloat(p.price) || 0;
+      let subtotal = qty * price;
+      total += subtotal;
+      result += `• ${p.product} × ${qty} بسعر ${price} جنيه = ${subtotal} جنيه\n`;
+    });
+
+    document.getElementById('invoiceBox').value = result;
+    document.getElementById('totalBox').textContent = `💰 الإجمالي: ${total} جنيه`;
+  }
+</script>
+
+</body>
+</html>

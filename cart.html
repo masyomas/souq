@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛒 سلة التسوق</title>
+<style>
+body {
+  font-family: 'Tahoma', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+header {
+  background: #007bff;
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  position: relative;
+}
+nav {
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+.cart-container {
+  padding: 10px;
+}
+.cart-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+.cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-left: 10px;
+  border-radius: 4px;
+}
+.cart-item-info {
+  flex: 1;
+}
+.delete-item {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.cart-total {
+  text-align: left;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 18px;
+}
+.checkout {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+  font-size: 16px;
+}
+.empty-cart {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+}
+.purchase-history {
+  margin-top: 30px;
+  border-top: 2px solid #007bff;
+  padding-top: 15px;
+}
+.purchase-history h3 {
+  color: #007bff;
+  text-align: center;
+}
+.purchase-history table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.purchase-history th, .purchase-history td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.purchase-history th {
+  background-color: #f2f2f2;
+}
+.points-summary {
+  background: #f8f9fa;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛒 سلة التسوق</h1>
+</header>
+
+<nav>
+  <a href="index.html">🏪 العودة للمتجر</a>
+</nav>
+
+<div id="successAlert" class="success-message" style="display:none;"></div>
+
+<div class="cart-container" id="cartContainer">
+  <p class="empty-cart">السلة فارغة</p>
+</div>
+
+<div class="cart-total">
+  الإجمالي: <span id="totalPrice">0</span> جنيه
+</div>
+
+<button class="checkout" onclick="startCheckoutProcess()">تأكيد الشراء</button>
+
+<div class="purchase-history" id="purchaseHistory">
+  <h3>سجل المشتريات السابقة</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>رقم العملية</th>
+        <th>الأصناف</th>
+        <th>الكمية</th>
+        <th>السعر</th>
+        <th>التاريخ</th>
+      </tr>
+    </thead>
+    <tbody id="historyBody">
+      <!-- يتم ملؤه بالبيانات من localStorage -->
+    </tbody>
+  </table>
+</div>
+
+<div class="points-summary" id="pointsSummary">
+  نقاطي: جاري الحساب...
+</div>
+
+<script>
+// بيانات السلة والمشتريات
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
+const loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
+const BONUS_PERCENT = 5; // نسبة النقاط (5% من إجمالي المشتريات)
+const STORE_PHONE = '01552402912';
+
+// عرض محتويات السلة
+function displayCart() {
+  const cartContainer = document.getElementById('cartContainer');
+  
+  if (cart.length === 0) {
+    cartContainer.innerHTML = '<p class="empty-cart">السلة فارغة</p>';
+    document.getElementById('totalPrice').textContent = '0';
+    return;
+  }
+
+  let html = '';
+  let total = 0;
+
+  cart.forEach(item => {
+    total += item.price * item.quantity;
+    html += `
+    <div class="cart-item">
+      <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50'">
+      <div class="cart-item-info">
+        <h4>${item.name}</h4>
+        <p>${item.price} جنيه × ${item.quantity}</p>
+      </div>
+      <button class="delete-item" onclick="removeItem('${item.id}')">حذف</button>
+    </div>`;
+  });
+
+  cartContainer.innerHTML = html;
+  document.getElementById('totalPrice').textContent = total.toFixed(2);
+}
+
+// حذف عنصر من السلة
+function removeItem(productId) {
+  cart = cart.filter(item => item.id !== productId);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  displayCart();
+  updateCartCount();
+}
+
+// عرض سجل المشتريات
+function displayPurchaseHistory() {
+  if (!loggedUser) {
+    document.getElementById('purchaseHistory').style.display = 'none';
+    return;
+  }
+
+  const userPurchases = purchases.filter(p => p.code === loggedUser.code);
+  const historyBody = document.getElementById('historyBody');
+  
+  if (userPurchases.length === 0) {
+    historyBody.innerHTML = '<tr><td colspan="5">لا توجد مشتريات سابقة</td></tr>';
+    return;
+  }
+
+  let html = '';
+  userPurchases.forEach((purchase, index) => {
+    html += `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${purchase.product}</td>
+      <td>${purchase.qty}</td>
+      <td>${(purchase.price * purchase.qty).toFixed(2)} جنيه</td>
+      <td>${purchase.timestamp}</td>
+    </tr>`;
+  });
+
+  historyBody.innerHTML = html;
+}
+
+// حساب النقاط
+function calculatePoints() {
+  if (!loggedUser) {
+    document.getElementById('pointsSummary').textContent = '⚠️ يرجى تسجيل الدخول لمشاهدة النقاط';
+    return;
+  }
+
+  const userPurchases = purchases.filter(p => p.code === loggedUser.code);
+  const totalPurchases = userPurchases.reduce((sum, p) => sum + (p.price * p.qty), 0);
+  const points = totalPurchases * (BONUS_PERCENT / 100);
+
+  document.getElementById('pointsSummary').innerHTML = `
+    نقاطي: <span style="color:#28a745;">${points.toFixed(2)} نقطة</span>
+    (${BONUS_PERCENT}% من إجمالي المشتريات السابقة)
+  `;
+}
+
+// عملية الشراء
+function startCheckoutProcess() {
+  if (cart.length === 0) {
+    alert('السلة فارغة!');
+    return;
+  }
+
+  if (!loggedUser) {
+    if (confirm('يجب تسجيل الدخول أولاً. هل تريد الذهاب إلى صفحة التسجيل الآن؟')) {
+      location.href = 'register.html?redirect=cart';
+    }
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  
+  if (confirm(`إجمالي الطلب: ${total.toFixed(2)} جنيه\nهل تريد الاتصال لمزيد من المعلومات؟`)) {
+    if (confirm(`سيتم الاتصال بالرقم: ${STORE_PHONE}\nهل تريد المتابعة؟`)) {
+      window.open(`tel:${STORE_PHONE}`, '_blank');
+      
+      setTimeout(() => {
+        confirmPurchase(total);
+      }, 2000);
+    }
+  } else {
+    confirmPurchase(total);
+  }
+}
+
+// تأكيد الشراء النهائي
+function confirmPurchase(total) {
+  if (confirm('هل تريد تأكيد عملية الشراء؟')) {
+    completePurchase(total);
+  } else {
+    if (confirm('هل أنت متأكد من إلغاء الشراء؟')) {
+      alert('تم إلغاء عملية الشراء');
+    } else {
+      confirmPurchase(total);
+    }
+  }
+}
+
+// إتمام عملية الشراء
+function completePurchase(total) {
+  if (!loggedUser) {
+    alert('يجب تسجيل الدخول لإتمام الشراء');
+    location.href = 'register.html?redirect=cart';
+    return;
+  }
+
+  // تسجيل العملية
+  const newPurchases = [];
+  cart.forEach(item => {
+    const purchase = {
+      phone: loggedUser.phone,
+      code: loggedUser.code,
+      product: item.name,
+      price: item.price,
+      img: item.img,
+      qty: item.quantity,
+      timestamp: new Date().toLocaleString('ar-EG')
+    };
+    purchases.push(purchase);
+    newPurchases.push(purchase);
+  });
+
+  // حفظ البيانات
+  localStorage.setItem('purchases', JSON.stringify(purchases));
+  cart = [];
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  // عرض رسالة النجاح مع تفاصيل الشراء
+  const successHtml = `
+    <strong>تم تأكيد الشراء بنجاح!</strong><br>
+    رقم العملية: #${purchases.length}<br>
+    ${newPurchases.map(p => `${p.product} (${p.qty})`).join('، ')}<br>
+    الإجمالي: ${total.toFixed(2)} جنيه
+  `;
+  
+  const successAlert = document.getElementById('successAlert');
+  successAlert.innerHTML = successHtml;
+  successAlert.style.display = 'block';
+
+  // تحديث العرض
+  displayCart();
+  displayPurchaseHistory();
+  calculatePoints();
+  updateCartCount();
+
+  // إخفاء رسالة النجاح بعد 5 ثواني
+  setTimeout(() => {
+    successAlert.style.display = 'none';
+  }, 5000);
+}
+
+// تحديث العداد في header
+function updateCartCount() {
+  const count = cart.length;
+  if (document.querySelector('.cart-count')) {
+    document.querySelector('.cart-count').textContent = count;
+  }
+}
+
+// تشغيل الوظائف عند التحميل
+displayCart();
+displayPurchaseHistory();
+calculatePoints();
+</script>
+</body>
+</html>

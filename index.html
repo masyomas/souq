@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏪 متجر ماسيو</title>
+<style>
+body {
+  font-family: 'Tahoma', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+header {
+  background: #007bff;
+  color: #fff;
+  padding: 8px;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+.marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 10s linear infinite;
+  font-size: 15px;
+}
+@keyframes scroll-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+nav {
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+nav a:hover {
+  color: #007bff;
+}
+section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+.card {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  text-align: center;
+}
+.card img {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+button {
+  background: #28a745;
+  color: #fff;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+button:hover {
+  background: #218838;
+}
+.cart-link {
+  color: #fff;
+  text-decoration: none;
+  position: absolute;
+  left: 15px;
+  top: 8px;
+}
+.cart-link:hover {
+  text-decoration: underline;
+}
+.cart-count {
+  background: #dc3545;
+  padding: 2px 5px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+footer {
+  background: #f1f1f1;
+  text-align: center;
+  padding: 6px;
+  font-size: 12px;
+  color: #777;
+  border-top: 1px solid #ddd;
+  margin-top: 6px;
+}
+/* تنسيقات جديدة للكمية */
+.quantity-control {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.quantity-label {
+  margin-left: 5px;
+}
+.quantity-select {
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 60px;
+}
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="cart.html" class="cart-link">🛒 السلة (<span class="cart-count">0</span>)</a>
+  <span class="marquee" id="userInfo">... جاري التحميل ...</span>
+</header>
+
+<nav>
+  <a href="index.html">🏪 المتجر</a>
+  <a href="cart.html">🛒 سلة الشراء</a>
+  <a href="register.html">🔑 حسابي</a>
+</nav>
+
+<section id="storeSection">
+  <p>⏳ جاري تحميل السلع...</p>
+</section>
+
+<footer>💎 متجر ماسيو © 2023 💎</footer>
+
+<script>
+// نظام السلة
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+const PRODUCTS_URL = 'https://dl.dropboxusercontent.com/scl/fi/uxlue3uda1dlj087nbhig/products.json?rlkey=7nsi66nha7wbc7hr8uasej9g9&st=bav15vxr';
+
+// تحديث عداد السلة
+function updateCartCount() {
+  document.querySelector('.cart-count').textContent = cart.length;
+}
+
+// الانتقال إلى السلة
+function goToCart() {
+  if (cart.length === 0) {
+    alert('السلة فارغة، أضف منتجات أولاً');
+    return false;
+  }
+  location.href = 'cart.html';
+  return true;
+}
+
+// إضافة منتج للسلة مع الكمية
+function addToCartWithQuantity(productId, productName, productPrice, productImg) {
+  const quantitySelect = document.getElementById(`qty-${productId}`);
+  const quantity = parseInt(quantitySelect.value);
+  const errorElement = document.getElementById(`error-${productId}`);
+
+  if (quantity === 0) {
+    errorElement.style.display = 'block';
+    errorElement.textContent = '⚠️ يرجى اختيار كمية أكبر من الصفر';
+    return;
+  }
+  
+  errorElement.style.display = 'none';
+
+  const existingItem = cart.find(item => item.id === productId);
+  
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    cart.push({
+      id: productId,
+      name: productName,
+      price: productPrice,
+      img: productImg,
+      quantity: quantity
+    });
+  }
+  
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  
+  if (confirm(`تمت إضافة ${quantity} من "${productName}" إلى السلة. هل تريد الذهاب إلى السلة الآن؟`)) {
+    goToCart();
+  } else {
+    quantitySelect.value = '0'; // إعادة تعيين الكمية بعد الإضافة
+  }
+}
+
+// تحميل المنتجات من Dropbox
+async function loadProducts() {
+  try {
+    const res = await fetch(PRODUCTS_URL);
+    if (!res.ok) throw new Error('فشل تحميل المنتجات');
+    const products = await res.json();
+    renderStore(products);
+    
+    // تخزين المنتجات مؤقتًا لتحسين الأداء
+    localStorage.setItem('cachedProducts', JSON.stringify(products));
+  } catch (e) {
+    console.error('حدث خطأ:', e);
+    
+    // محاولة استخدام النسخة المخزنة محليًا
+    const cachedProducts = localStorage.getItem('cachedProducts');
+    if (cachedProducts) {
+      renderStore(JSON.parse(cachedProducts));
+      return;
+    }
+    
+    document.getElementById('storeSection').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;color:red;">
+        ⚠️ تعذر تحميل قائمة المنتجات. يرجى المحاولة لاحقًا
+      </div>
+    `;
+  }
+}
+
+// عرض المنتجات مع خيارات الكمية
+function renderStore(products) {
+  let html = "";
+  products.forEach((p, i) => {
+    html += `
+    <div class="card">
+      <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/150'">
+      <h4>${p.name}</h4>
+      <p>السعر: ${p.price} جنيه</p>
+      <p style="font-size:12px;color:#555;">${p.details}</p>
+      
+      <div class="quantity-control">
+        <select id="qty-${i}" class="quantity-select">
+          ${Array.from({length: 10}, (_, index) => 
+            `<option value="${index}">${index}</option>`
+          ).join('')}
+        </select>
+        <span class="quantity-label">الكمية</span>
+      </div>
+      <div id="error-${i}" class="error-message"></div>
+      
+      <button onclick="addToCartWithQuantity('${i}', '${p.name.replace(/'/g,"\\'")}', ${p.price}, '${p.img}')">
+        🛒 أضف للسلة
+      </button>
+    </div>`;
+  });
+  document.getElementById('storeSection').innerHTML = html;
+}
+
+// نظام المستخدم
+const logged = JSON.parse(localStorage.getItem('loggedUser'));
+const bonusPercent = parseFloat(localStorage.getItem('bonus') || "1");
+let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+
+function updateUserInfo() {
+  if (logged) {
+    const userPurchases = purchases.filter(p => p.code === logged.code);
+    const total = userPurchases.reduce((sum, p) => sum + (p.price * p.qty), 0);
+    const bonus = total * (bonusPercent / 100);
+    document.getElementById('userInfo').textContent =
+      `👤 ${logged.name} | كود: ${logged.code} | البونص: ${bonus.toFixed(2)} جنيه`;
+  } else {
+    document.getElementById('userInfo').textContent = "⚠️ لم تسجل دخول بعد";
+  }
+}
+
+// تشغيل الوظائف عند التحميل
+updateUserInfo();
+loadProducts();
+updateCartCount();
+</script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔑 حسابي / تسجيل</title>
+<style>
+body { 
+  font-family:'Tahoma', sans-serif; 
+  margin:0; 
+  padding:0; 
+  background:#fff; 
+  text-align:center;
+}
+header { 
+  background:#6c757d; 
+  color:#fff; 
+  padding:12px; 
+  font-size:20px;
+}
+nav { 
+  background:#f8f9fa; 
+  display:flex; 
+  justify-content:space-around; 
+  padding:8px; 
+  border-top:1px solid #ddd; 
+  border-bottom:1px solid #ddd;
+}
+nav a { 
+  text-decoration:none; 
+  color:#333; 
+  font-size:14px;
+}
+nav a:hover { 
+  color:#007bff;
+}
+section { 
+  margin:10px auto; 
+  width:90%; 
+  max-width:450px; 
+  text-align:right;
+}
+h3 { 
+  font-size:18px; 
+  margin:10px 0; 
+  background:#007bff; 
+  color:#fff; 
+  padding:6px; 
+  border-radius:4px; 
+}
+input[type=text], 
+input[type=number], 
+input[type=password] { 
+  width:95%; 
+  padding:8px; 
+  margin:4px 0; 
+  border:1px solid #ccc; 
+  border-radius:4px;
+}
+button { 
+  background:#007bff; 
+  color:#fff; 
+  padding:6px 10px; 
+  border:none; 
+  border-radius:4px; 
+  cursor:pointer; 
+  margin:5px 0;
+}
+button:hover { 
+  background:#0056b3;
+}
+.logoutBtn { 
+  background:#dc3545; 
+}
+.logoutBtn:hover { 
+  background:#c82333;
+}
+table { 
+  width:100%; 
+  border-collapse:collapse; 
+  margin-top:6px;
+}
+td, th { 
+  border:1px solid #ccc; 
+  padding:4px; 
+  font-size:12px;
+}
+footer { 
+  background:#f1f1f1; 
+  text-align:center; 
+  padding:8px; 
+  font-size:13px; 
+  color:#777; 
+  border-top:1px solid #ddd; 
+  margin-top:10px;
+}
+.redirect-notice {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid #ffeeba;
+}
+</style>
+</head>
+<body>
+
+<header>🔑 حسابي / تسجيل</header>
+
+<nav>
+  <a href="index.html">🏪 المتجر</a>
+  <a href="cart.html">🛒 سلة الشراء</a>
+  <a href="register.html">🔑 حسابي</a>
+</nav>
+
+<section id="accountSection">
+  <!-- سيتم ملؤه تلقائيًا -->
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+let users = JSON.parse(localStorage.getItem('users') || "[]");
+let purchases = JSON.parse(localStorage.getItem('purchases') || "[]");
+let logged = JSON.parse(localStorage.getItem('loggedUser'));
+
+// إضافة أدمن افتراضي إذا لم يكن موجوداً
+if(!localStorage.getItem('adminsAdded')){
+  users.push({
+    name: "Super Admin", 
+    phone: "01552402912", 
+    code: 790707071, 
+    password: "790707071", 
+    role: "superadmin"
+  });
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('adminsAdded', "yes");
+}
+
+// التحقق من وجود redirect في URL
+const urlParams = new URLSearchParams(window.location.search);
+const redirectTo = urlParams.get('redirect');
+
+function renderAccount(){
+  let html = "";
+  
+  // إذا كان هناك redirect ولم يتم تسجيل الدخول
+  if (redirectTo && !logged) {
+    html += `
+    <div class="redirect-notice">
+      ⚠️ يجب تسجيل الدخول أولاً للوصول إلى صفحة السلة
+    </div>`;
+  }
+
+  if(!logged){
+    html += `
+    <h3>تسجيل مستخدم جديد</h3>
+    <input type="text" id="newName" placeholder="الاسم الثلاثي بالعربي">
+    <input type="text" id="newPhone" placeholder="رقم الهاتف (11 رقم)">
+    <input type="password" id="newPass" placeholder="اختر كلمة مرور">
+    <button onclick="register()">تسجيل</button>
+
+    <h3>أو تسجيل الدخول</h3>
+    <input type="text" id="loginPhone" placeholder="رقم الهاتف">
+    <input type="password" id="loginPass" placeholder="كلمة المرور">
+    <button onclick="login()">دخول</button>
+    `;
+  } else {
+    // ملخص المشتريات
+    let userPurchases = purchases.filter(p => p.phone === logged.phone);
+    let total = userPurchases.reduce((sum, p) => sum + (p.price * p.qty), 0);
+    let htmlTable = "";
+    
+    if(userPurchases.length){
+      htmlTable = `<table>
+        <tr><th>الصنف</th><th>الكمية</th><th>السعر</th></tr>`;
+      
+      userPurchases.slice(-5).forEach(p => {
+        htmlTable += `<tr>
+          <td>${p.product}</td>
+          <td>${p.qty}</td>
+          <td>${p.price * p.qty} ج.م</td>
+        </tr>`;
+      });
+      
+      htmlTable += `</table>`;
+    } else {
+      htmlTable = `<p>📦 لا توجد مشتريات بعد.</p>`;
+    }
+
+    html += `
+    <h3>👤 مرحبًا ${logged.name}</h3>
+    <div>📞 هاتف: ${logged.phone}</div>
+    <div>🔑 كودك: ${logged.code}</div>
+    <div style="margin-top:5px;">
+      <button onclick="showEditPhone()">✏️ تعديل رقم الهاتف</button>
+      <button onclick="showEditPass()">🔒 تغيير كلمة السر</button>
+    </div>
+    <button class="logoutBtn" onclick="logout()">تسجيل خروج</button>
+
+    <h3>💰 ملخص المشتريات</h3>
+    <div>عدد السلع: ${userPurchases.length}</div>
+    <div>إجمالي المشتريات: ${total} ج.م</div>
+    ${htmlTable}
+    `;
+    
+    // إذا كان هناك redirect وتم تسجيل الدخول
+    if (redirectTo) {
+      setTimeout(() => {
+        location.href = `${redirectTo}.html`;
+      }, 1500);
+    }
+  }
+  
+  document.getElementById('accountSection').innerHTML = html;
+}
+
+function register(){
+  let name = document.getElementById('newName').value.trim();
+  let phone = document.getElementById('newPhone').value.trim();
+  let password = document.getElementById('newPass').value.trim();
+  let code = Math.floor(Math.random() * (9999 - 1111 + 1)) + 1111;
+
+  if(!/^[\u0600-\u06FF ]{7,}$/.test(name)){ 
+    alert("❗ الاسم يجب أن يكون ثلاثي بالعربي."); 
+    return;
+  }
+  
+  if(!/^0\d{10}$/.test(phone)){ 
+    alert("❗ رقم الهاتف يجب أن يبدأ بـ0 ويتكون من 11 رقم."); 
+    return;
+  }
+  
+  if(password.length < 4){ 
+    alert("❗ كلمة السر يجب أن تكون 4 أحرف أو أكثر."); 
+    return;
+  }
+  
+  if(users.find(u => u.phone === phone)){ 
+    alert("⚠️ هذا الرقم مسجل بالفعل."); 
+    return;
+  }
+
+  let user = {
+    name, 
+    phone, 
+    code, 
+    password, 
+    role: "user"
+  };
+  
+  users.push(user);
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('loggedUser', JSON.stringify(user));
+  
+  alert("✅ تم التسجيل بنجاح.");
+  
+  // إذا كان هناك redirect بعد التسجيل
+  if (redirectTo) {
+    location.href = `${redirectTo}.html`;
+  } else {
+    location.reload();
+  }
+}
+
+function login(){
+  let phone = document.getElementById('loginPhone').value.trim();
+  let password = document.getElementById('loginPass').value.trim();
+  let user = users.find(u => u.phone === phone && u.password === password);
+  
+  if(user){
+    localStorage.setItem('loggedUser', JSON.stringify(user));
+    alert("✅ تم تسجيل الدخول بنجاح.");
+    
+    // التوجيه بعد تسجيل الدخول
+    if (redirectTo) {
+      location.href = `${redirectTo}.html`;
+    } else if(user.role === "superadmin" || user.role === "admin") {
+      location.href = "admin.html";
+    } else {
+      location.href = "index.html";
+    }
+  } else {
+    alert("❌ بيانات الدخول غير صحيحة.");
+  }
+}
+
+function showEditPhone(){
+  let newPhone = prompt("📞 أدخل رقم الهاتف الجديد:");
+  
+  if(newPhone && /^0\d{10}$/.test(newPhone)){
+    if(users.find(u => u.phone === newPhone)){ 
+      alert("⚠️ الرقم مستخدم بالفعل."); 
+      return;
+    }
+    
+    let i = users.findIndex(u => u.phone === logged.phone && u.code === logged.code);
+    users[i].phone = newPhone;
+    logged.phone = newPhone;
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('loggedUser', JSON.stringify(logged));
+    
+    alert("✅ تم تحديث رقم الهاتف.");
+    renderAccount();
+  } else {
+    alert("❌ رقم غير صحيح.");
+  }
+}
+
+function showEditPass(){
+  let newPass = prompt("🔒 أدخل كلمة السر الجديدة (4 أحرف فأكثر):");
+  
+  if(newPass && newPass.length >= 4){
+    let i = users.findIndex(u => u.phone === logged.phone && u.code === logged.code);
+    users[i].password = newPass;
+    logged.password = newPass;
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('loggedUser', JSON.stringify(logged));
+    
+    alert("✅ تم تحديث كلمة السر.");
+    renderAccount();
+  } else {
+    alert("❌ كلمة السر قصيرة.");
+  }
+}
+
+function logout(){
+  localStorage.removeItem('loggedUser');
+  location.reload();
+}
+
+// تشغيل الوظيفة الرئيسية عند التحميل
+renderAccount();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💎 لوحة الإدارة الشاملة</title>
+<style>
+body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; }
+header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center; position:sticky; top:0; }
+nav { display:flex; justify-content:space-around; background:#f8f9fa; border-bottom:1px solid #ddd; }
+nav button { flex:1; padding:8px; border:none; background:none; cursor:pointer; font-size:14px; }
+nav button.active { background:#007bff; color:#fff; }
+section { margin:10px auto; width:95%; max-width:800px; }
+h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px; margin-top:10px; }
+table { width:100%; border-collapse:collapse; margin-top:8px; }
+td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center; }
+input.qtyInput { width:50px; text-align:center; }
+button.action { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin:2px; }
+button.action:hover { background:#218838; }
+.delBtn { background:#dc3545; }
+.delBtn:hover { background:#c82333; }
+input[type=number], input[type=text], input[type=password] { width:90%; padding:4px; margin:4px 0; border:1px solid #ccc; border-radius:4px; }
+label { font-size:13px; }
+footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; margin-top:10px; }
+.points-control { background:#f8f9fa; padding:10px; border-radius:4px; margin:10px 0; }
+.img-thumbnail { width:50px; height:50px; object-fit:cover; border-radius:4px; }
+.loading { text-align:center; padding:20px; }
+</style>
+</head>
+<body>
+
+<header>💎 لوحة الإدارة الشاملة</header>
+
+<nav id="tabs">
+  <button onclick="showTab('dashboard')" class="active">🏠 لوحة التحكم</button>
+  <button onclick="showTab('sales')">💰 المبيعات</button>
+  <button onclick="showTab('cart')">🛒 إدارة السلة</button>
+</nav>
+
+<section id="content">
+  <div class="loading">⏳ جاري التحميل...</div>
+</section>
+
+<footer>💎 Powered by Almasa 💎</footer>
+
+<script>
+// تحميل البيانات الأولية
+document.addEventListener('DOMContentLoaded', function() {
+  loadData();
+});
+
+// متغيرات البيانات
+let logged, users, products, purchases, cart, pointsRate;
+
+function loadData() {
+  try {
+    logged = JSON.parse(localStorage.getItem('loggedUser') || {};
+    users = JSON.parse(localStorage.getItem('users') || [];
+    products = JSON.parse(localStorage.getItem('products') || [];
+    purchases = JSON.parse(localStorage.getItem('purchases') || [];
+    cart = JSON.parse(localStorage.getItem('cart') || [];
+    pointsRate = parseFloat(localStorage.getItem('pointsRate') || 5;
+    
+    // التحقق من صلاحية المدير
+    if(logged.role !== "superadmin"){ 
+      document.getElementById('content').innerHTML='🚫 لا تملك صلاحية الدخول.'; 
+      return;
+    }
+    
+    showTab('dashboard');
+  } catch (e) {
+    console.error('خطأ في تحميل البيانات:', e);
+    document.getElementById('content').innerHTML='⚠️ حدث خطأ في تحميل البيانات.';
+  }
+}
+
+function showTab(tab){
+  try {
+    document.querySelectorAll('#tabs button').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`#tabs button[onclick*="${tab}"]`).classList.add('active');
+    
+    let content = document.getElementById('content');
+    content.innerHTML = '<div class="loading">⏳ جاري التحميل...</div>';
+    
+    setTimeout(() => {
+      if(tab === 'dashboard') renderDashboard();
+      else if(tab === 'sales') renderSales();
+      else if(tab === 'cart') renderCartControl();
+    }, 100);
+  } catch (e) {
+    console.error('خطأ في عرض التبويب:', e);
+    document.getElementById('content').innerHTML='⚠️ حدث خطأ في عرض المحتوى.';
+  }
+}
+
+// لوحة التحكم الرئيسية
+function renderDashboard(){
+  let html = `<h3>🏠 لوحة التحكم</h3>
+  <div>مرحبًا ${logged.name} | هاتف: ${logged.phone} | كودك: ${logged.code}</div>
+  
+  <div class="points-control">
+    <h3>🎯 نظام النقاط</h3>
+    <label>نسبة النقاط من إجمالي المشتريات:</label>
+    <input type="number" id="pointsRateInput" value="${pointsRate}" min="0" max="100" step="0.5">
+    <span>%</span>
+    <button onclick="updatePointsRate()" class="action">💾 حفظ النسبة</button>
+    <p>مثال: إذا كانت النسبة 5% ومجموع مشتريات العميل 1000 ج.م، سيكون له 50 نقطة</p>
+  </div>
+
+  <h3>👥 إدارة المديرين</h3>
+  <input type="text" id="adminName" placeholder="اسم المدير">
+  <input type="text" id="adminPhone" placeholder="رقم الهاتف">
+  <input type="password" id="adminPass" placeholder="كلمة المرور">
+  <label><input type="checkbox" id="permViewSales"> مشاهدة المبيعات</label>
+  <label><input type="checkbox" id="permDeleteSales"> حذف المبيعات</label>
+  <button onclick="addAdmin()" class="action">➕ إضافة مدير</button>
+  <table>
+    <tr><th>الاسم</th><th>الهاتف</th><th>الدور</th><th>الصلاحيات</th></tr>`;
+  
+  users.filter(u => u.role === "admin").forEach(u => {
+    let permissions = [];
+    if(u.permissions?.canViewSales) permissions.push("مشاهدة المبيعات");
+    if(u.permissions?.canDeleteSales) permissions.push("حذف المبيعات");
+    
+    html += `<tr>
+      <td>${u.name}</td>
+      <td>${u.phone}</td>
+      <td>${u.role}</td>
+      <td>${permissions.join('، ') || 'لا يوجد'}</td>
+    </tr>`;
+  });
+  
+  html += `</table>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+// صفحة المبيعات
+function renderSales(){
+  let html = `<h3>💰 المبيعات</h3>`;
+  
+  if(purchases.length > 0){
+    // إحصائيات المبيعات
+    const totalSales = purchases.reduce((sum, p) => sum + (p.price * p.qty), 0);
+    const uniqueCustomers = [...new Set(purchases.map(p => p.phone))].length;
+    
+    html += `
+    <div style="background:#f8f9fa; padding:10px; margin-bottom:10px; border-radius:4px;">
+      <strong>إحصائيات المبيعات:</strong>
+      <div>عدد العملاء: ${uniqueCustomers}</div>
+      <div>إجمالي المبيعات: ${totalSales.toFixed(2)} ج.م</div>
+      <div>عدد العمليات: ${purchases.length}</div>
+    </div>
+    <table>
+      <tr>
+        <th>رقم العملية</th>
+        <th>العميل</th>
+        <th>المنتج</th>
+        <th>الكمية</th>
+        <th>السعر</th>
+        <th>الإجمالي</th>
+        <th>التاريخ</th>
+        <th>حذف</th>
+      </tr>`;
+    
+    purchases.forEach((p, i) => {
+      html += `<tr>
+        <td>${i+1}</td>
+        <td>${p.name || p.phone}</td>
+        <td>${p.product}</td>
+        <td>${p.qty}</td>
+        <td>${p.price} ج.م</td>
+        <td>${(p.price * p.qty).toFixed(2)} ج.م</td>
+        <td>${p.timestamp}</td>
+        <td><button onclick="deletePurchase(${i})" class="delBtn">🗑️</button></td>
+      </tr>`;
+    });
+    
+    html += `</table>`;
+  } else { 
+    html += "<p>📦 لا توجد مبيعات بعد.</p>"; 
+  }
+  
+  document.getElementById('content').innerHTML = html;
+}
+
+// إدارة السلة
+function renderCartControl(){
+  let html = `<h3>🛒 إدارة سلة التسوق</h3>`;
+  
+  if(cart.length > 0){
+    html += `
+    <table>
+      <tr>
+        <th>الصورة</th>
+        <th>المنتج</th>
+        <th>السعر</th>
+        <th>الكمية</th>
+        <th>الإجمالي</th>
+        <th>إجراءات</th>
+      </tr>`;
+    
+    cart.forEach((item, index) => {
+      html += `
+      <tr>
+        <td><img src="${item.img}" class="img-thumbnail" onerror="this.src='https://via.placeholder.com/50'"></td>
+        <td>${item.name}</td>
+        <td>${item.price} ج.م</td>
+        <td><input type="number" value="${item.quantity}" min="1" id="qty-${index}" style="width:60px;"></td>
+        <td>${(item.price * item.quantity).toFixed(2)} ج.م</td>
+        <td>
+          <button onclick="updateCartItem(${index})" class="action">🔄</button>
+          <button onclick="removeCartItem(${index})" class="delBtn">🗑️</button>
+        </td>
+      </tr>`;
+    });
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    html += `
+      <tr style="font-weight:bold;">
+        <td colspan="4">الإجمالي</td>
+        <td>${total.toFixed(2)} ج.م</td>
+        <td></td>
+      </tr>
+    </table>`;
+  } else {
+    html += "<p>السلة فارغة حالياً</p>";
+  }
+  
+  document.getElementById('content').innerHTML = html;
+}
+
+// تحديث نسبة النقاط
+function updatePointsRate(){
+  let newRate = parseFloat(document.getElementById('pointsRateInput').value);
+  if(isNaN(newRate)) { 
+    alert("❗ أدخل رقم صحيح."); 
+    return; 
+  }
+  
+  pointsRate = newRate;
+  localStorage.setItem('pointsRate', pointsRate);
+  alert("✅ تم تحديث نسبة النقاط.");
+}
+
+// إضافة مدير جديد
+function addAdmin(){
+  let name = document.getElementById('adminName').value.trim();
+  let phone = document.getElementById('adminPhone').value.trim();
+  let pass = document.getElementById('adminPass').value.trim();
+  let code = Math.floor(2000 + Math.random() * 8000);
+  
+  let permissions = {
+    canViewSales: document.getElementById('permViewSales').checked,
+    canDeleteSales: document.getElementById('permDeleteSales').checked
+  };
+  
+  if(!name || !phone || !pass){ 
+    alert("❗ أكمل البيانات."); 
+    return; 
+  }
+  
+  users.push({
+    name,
+    phone,
+    password: pass,
+    code,
+    role: "admin",
+    permissions
+  });
+  
+  localStorage.setItem('users', JSON.stringify(users));
+  alert(`✅ تم إضافة المدير بنجاح بكود: ${code}`);
+  renderDashboard();
+}
+
+// حذف عملية بيع
+function deletePurchase(index){
+  if(confirm("⚠️ هل أنت متأكد من حذف هذه العملية؟")){
+    purchases.splice(index, 1);
+    localStorage.setItem('purchases', JSON.stringify(purchases));
+    renderSales();
+  }
+}
+
+// تحديث عنصر في السلة
+function updateCartItem(index){
+  const newQty = parseInt(document.getElementById(`qty-${index}`).value);
+  if(isNaN(newQty) || newQty < 1){
+    alert("❗ أدخل كمية صحيحة");
+    return;
+  }
+  
+  cart[index].quantity = newQty;
+  localStorage.setItem('cart', JSON.stringify(cart));
+  renderCartControl();
+}
+
+// حذف عنصر من السلة
+function removeCartItem(index){
+  if(confirm("⚠️ هل تريد حذف هذا المنتج من السلة؟")){
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    renderCartControl();
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 تقرير المستخدمين</title>
+<style>
+body { font-family:'Tahoma',sans-serif; margin:0; padding:10px; background:#fff;}
+h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px;}
+table { width:100%; border-collapse:collapse; margin-top:8px;}
+td, th { border:1px solid #ccc; padding:4px; font-size:13px;}
+#content { display:none; }  /* في البداية نخفي المحتوى */
+</style>
+</head>
+<body>
+
+<div id="content">
+<h3>📋 تقرير المستخدمين المسجلين</h3>
+<div id="usersTable"></div>
+</div>
+
+<script>
+// باسورد السوبر أدمن
+const superAdminPassword = "790707071";
+
+// نطلب كلمة السر
+let inputPass = prompt("🔐 أدخل كلمة مرور السوبر أدمن للوصول للتقرير:");
+
+// تحقق
+if(inputPass === superAdminPassword){
+    document.getElementById('content').style.display = "block";
+
+    // بعد التأكد نعرض البيانات
+    let users=JSON.parse(localStorage.getItem('users')||"[]");
+    let html="";
+    let normalUsers = users.filter(u=>u.role=="user");
+    if(normalUsers.length){
+      html+=`<table>
+      <tr><th>الاسم</th><th>رقم الهاتف</th><th>الكود</th></tr>`;
+      normalUsers.forEach(u=>{
+        html+=`<tr><td>${u.name}</td><td>${u.phone}</td><td>${u.code}</td></tr>`;
+      });
+      html+=`</table>`;
+    }else{
+      html="لا يوجد مستخدمين بعد.";
+    }
+    document.getElementById('usersTable').innerHTML=html;
+
+}else{
+    alert("🚫 كلمة المرور غير صحيحة.");
+    window.location.href = "index.html";  // أو أي صفحة ثانية
+}
+</script>
+
+</body>
+</html>

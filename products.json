@@ -1,0 +1,122 @@
+[
+  {
+    "name": "تفاحة حمراء",
+    "price": 5.5,
+    "details": "تفاح طازج ولذيذ من أجود المزارع",
+    "img": "https://masyomas.github.io/Market/1.jpg"
+  },
+  {
+    "name": "برتقال عصير",
+    "price": 6.0,
+    "details": "برتقال طازج غني بفيتامين C",
+    "img": "https://masyomas.github.io/Market/2.jpg"
+  },
+  {
+    "name": "موز بلدي",
+    "price": 7.5,
+    "details": "موز طبيعي حلو المذاق",
+    "img": "https://masyomas.github.io/Market/3.jpg"
+  },
+  {
+    "name": "عنب أحمر",
+    "price": 8.0,
+    "details": "عنب طازج بطعم سكري لذيذ",
+    "img": "https://masyomas.github.io/Market/4.jpg"
+  },
+  {
+    "name": "كيوي مستورد",
+    "price": 9.0,
+    "details": "كيوي غني بالفيتامينات بطعم رائع",
+    "img": "https://masyomas.github.io/Market/5.jpg"
+  },
+  {
+    "name": "فراولة طازجة",
+    "price": 10.0,
+    "details": "فراولة حمراء طازجة وعصيرية",
+    "img": "https://masyomas.github.io/Market/6.jpg"
+  },
+  {
+    "name": "خوخ أصفر",
+    "price": 8.5,
+    "details": "خوخ أصفر ناضج وطازج",
+    "img": "https://masyomas.github.io/Market/7.jpg"
+  },
+  {
+    "name": "كمثرى ناعمة",
+    "price": 7.0,
+    "details": "كمثرى حلوة الطعم وسهلة الأكل",
+    "img": "https://masyomas.github.io/Market/8.jpg"
+  },
+  {
+    "name": "بطيخ بلدي",
+    "price": 12.0,
+    "details": "بطيخ أحمر حلو الطعم ومنعش",
+    "img": "https://masyomas.github.io/Market/9.jpg"
+  },
+  {
+    "name": "مانجو سكري",
+    "price": 15.0,
+    "details": "مانجو طازج بنكهة سكري رائعة",
+    "img": "https://masyomas.github.io/Market/10.jpg"
+  },
+  {
+    "name": "رمان طازج",
+    "price": 11.0,
+    "details": "رمان طازج غني بالعصير",
+    "img": "https://masyomas.github.io/Market/11.jpg"
+  },
+  {
+    "name": "توت بري",
+    "price": 13.0,
+    "details": "توت طازج صحي ولذيذ",
+    "img": "https://masyomas.github.io/Market/12.jpg"
+  },
+  {
+    "name": "بابايا مستوردة",
+    "price": 14.0,
+    "details": "بابايا ناضجة بطعم رائع",
+    "img": "https://masyomas.github.io/Market/13.jpg"
+  },
+  {
+    "name": "ليمون بلدي",
+    "price": 4.0,
+    "details": "ليمون طازج مناسب للعصير والطبخ",
+    "img": "https://masyomas.github.io/Market/14.jpg"
+  },
+  {
+    "name": "جوافة طازجة",
+    "price": 6.5,
+    "details": "جوافة بلدي بطعم رائع",
+    "img": "https://masyomas.github.io/Market/15.jpg"
+  },
+  {
+    "name": "مشمش سكري",
+    "price": 9.5,
+    "details": "مشمش طازج بطعم سكري",
+    "img": "https://masyomas.github.io/Market/16.jpg"
+  },
+  {
+    "name": "كرز أحمر",
+    "price": 18.0,
+    "details": "كرز أحمر لذيذ وشهي",
+    "img": "https://masyomas.github.io/Market/17.jpg"
+  },
+  {
+    "name": "تين طازج",
+    "price": 12.5,
+    "details": "تين طازج من المزارع المحلية",
+    "img": "https://masyomas.github.io/Market/18.jpg"
+  },
+  {
+    "name": "أناناس مستورد",
+    "price": 20.0,
+    "details": "أناناس طازج بطعم حلو",
+    "img": "https://masyomas.github.io/Market/19.jpg"
+  },
+  {
+    "name": "شمام بلدي",
+    "price": 8.0,
+    "details": "شمام حلو الطعم ومنعش",
+    "img": "https://masyomas.github.io/Market/20.jpg"
+  }
+]
