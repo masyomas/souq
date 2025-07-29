@@ -1,309 +1,746 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💎 لوحة الإدارة الشاملة</title>
-<style>
-body { font-family:'Tahoma',sans-serif; margin:0; padding:0; background:#fff; }
-header { background:#6c757d; color:#fff; padding:12px; font-size:20px; text-align:center; position:sticky; top:0; }
-nav { display:flex; justify-content:space-around; background:#f8f9fa; border-bottom:1px solid #ddd; }
-nav button { flex:1; padding:8px; border:none; background:none; cursor:pointer; font-size:14px; }
-nav button.active { background:#007bff; color:#fff; }
-section { margin:10px auto; width:95%; max-width:800px; }
-h3 { background:#007bff; color:#fff; padding:6px; border-radius:4px; font-size:17px; margin-top:10px; }
-table { width:100%; border-collapse:collapse; margin-top:8px; }
-td, th { border:1px solid #ccc; padding:4px; font-size:13px; text-align:center; }
-input.qtyInput { width:50px; text-align:center; }
-button.action { background:#28a745; color:#fff; padding:4px 8px; border:none; border-radius:4px; cursor:pointer; margin:2px; }
-button.action:hover { background:#218838; }
-.delBtn { background:#dc3545; }
-.delBtn:hover { background:#c82333; }
-input[type=number], input[type=text], input[type=password] { width:90%; padding:4px; margin:4px 0; border:1px solid #ccc; border-radius:4px; }
-label { font-size:13px; }
-footer { background:#f1f1f1; text-align:center; padding:8px; font-size:13px; color:#777; margin-top:10px; }
-.points-control { background:#f8f9fa; padding:10px; border-radius:4px; margin:10px 0; }
-.img-thumbnail { width:50px; height:50px; object-fit:cover; border-radius:4px; }
-.loading { text-align:center; padding:20px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إدارة المتجر</title>
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Tahoma', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--dark);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        nav {
+            display: flex;
+            background-color: var(--light);
+            border-bottom: 1px solid #ddd;
+        }
+        
+        nav button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        nav button:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        nav button.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        main {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light);
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .img-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .alert {
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 5px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-
-<header>💎 لوحة الإدارة الشاملة</header>
-
-<nav id="tabs">
-  <button onclick="showTab('dashboard')" class="active">🏠 لوحة التحكم</button>
-  <button onclick="showTab('sales')">💰 المبيعات</button>
-  <button onclick="showTab('cart')">🛒 إدارة السلة</button>
-</nav>
-
-<section id="content">
-  <div class="loading">⏳ جاري التحميل...</div>
-</section>
-
-<footer>💎 Powered by Almasa 💎</footer>
-
-<script>
-// تحميل البيانات الأولية
-document.addEventListener('DOMContentLoaded', function() {
-  loadData();
-});
-
-// متغيرات البيانات
-let logged, users, products, purchases, cart, pointsRate;
-
-function loadData() {
-  try {
-    logged = JSON.parse(localStorage.getItem('loggedUser') || {};
-    users = JSON.parse(localStorage.getItem('users') || [];
-    products = JSON.parse(localStorage.getItem('products') || [];
-    purchases = JSON.parse(localStorage.getItem('purchases') || [];
-    cart = JSON.parse(localStorage.getItem('cart') || [];
-    pointsRate = parseFloat(localStorage.getItem('pointsRate') || 5;
+    <header>
+        <h1>لوحة إدارة المتجر الإلكتروني</h1>
+    </header>
     
-    // التحقق من صلاحية المدير
-    if(logged.role !== "superadmin"){ 
-      document.getElementById('content').innerHTML='🚫 لا تملك صلاحية الدخول.'; 
-      return;
-    }
+    <nav id="tabs">
+        <button onclick="showTab('dashboard')" class="active">لوحة التحكم</button>
+        <button onclick="showTab('products')">المنتجات</button>
+        <button onclick="showTab('orders')">الطلبات</button>
+        <button onclick="showTab('customers')">العملاء</button>
+        <button onclick="showTab('settings')">الإعدادات</button>
+    </nav>
     
-    showTab('dashboard');
-  } catch (e) {
-    console.error('خطأ في تحميل البيانات:', e);
-    document.getElementById('content').innerHTML='⚠️ حدث خطأ في تحميل البيانات.';
-  }
-}
+    <main id="content">
+        <div class="loading">جاري تحميل البيانات...</div>
+    </main>
 
-function showTab(tab){
-  try {
-    document.querySelectorAll('#tabs button').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`#tabs button[onclick*="${tab}"]`).classList.add('active');
-    
-    let content = document.getElementById('content');
-    content.innerHTML = '<div class="loading">⏳ جاري التحميل...</div>';
-    
-    setTimeout(() => {
-      if(tab === 'dashboard') renderDashboard();
-      else if(tab === 'sales') renderSales();
-      else if(tab === 'cart') renderCartControl();
-    }, 100);
-  } catch (e) {
-    console.error('خطأ في عرض التبويب:', e);
-    document.getElementById('content').innerHTML='⚠️ حدث خطأ في عرض المحتوى.';
-  }
-}
-
-// لوحة التحكم الرئيسية
-function renderDashboard(){
-  let html = `<h3>🏠 لوحة التحكم</h3>
-  <div>مرحبًا ${logged.name} | هاتف: ${logged.phone} | كودك: ${logged.code}</div>
-  
-  <div class="points-control">
-    <h3>🎯 نظام النقاط</h3>
-    <label>نسبة النقاط من إجمالي المشتريات:</label>
-    <input type="number" id="pointsRateInput" value="${pointsRate}" min="0" max="100" step="0.5">
-    <span>%</span>
-    <button onclick="updatePointsRate()" class="action">💾 حفظ النسبة</button>
-    <p>مثال: إذا كانت النسبة 5% ومجموع مشتريات العميل 1000 ج.م، سيكون له 50 نقطة</p>
-  </div>
-
-  <h3>👥 إدارة المديرين</h3>
-  <input type="text" id="adminName" placeholder="اسم المدير">
-  <input type="text" id="adminPhone" placeholder="رقم الهاتف">
-  <input type="password" id="adminPass" placeholder="كلمة المرور">
-  <label><input type="checkbox" id="permViewSales"> مشاهدة المبيعات</label>
-  <label><input type="checkbox" id="permDeleteSales"> حذف المبيعات</label>
-  <button onclick="addAdmin()" class="action">➕ إضافة مدير</button>
-  <table>
-    <tr><th>الاسم</th><th>الهاتف</th><th>الدور</th><th>الصلاحيات</th></tr>`;
-  
-  users.filter(u => u.role === "admin").forEach(u => {
-    let permissions = [];
-    if(u.permissions?.canViewSales) permissions.push("مشاهدة المبيعات");
-    if(u.permissions?.canDeleteSales) permissions.push("حذف المبيعات");
-    
-    html += `<tr>
-      <td>${u.name}</td>
-      <td>${u.phone}</td>
-      <td>${u.role}</td>
-      <td>${permissions.join('، ') || 'لا يوجد'}</td>
-    </tr>`;
-  });
-  
-  html += `</table>`;
-  document.getElementById('content').innerHTML = html;
-}
-
-// صفحة المبيعات
-function renderSales(){
-  let html = `<h3>💰 المبيعات</h3>`;
-  
-  if(purchases.length > 0){
-    // إحصائيات المبيعات
-    const totalSales = purchases.reduce((sum, p) => sum + (p.price * p.qty), 0);
-    const uniqueCustomers = [...new Set(purchases.map(p => p.phone))].length;
-    
-    html += `
-    <div style="background:#f8f9fa; padding:10px; margin-bottom:10px; border-radius:4px;">
-      <strong>إحصائيات المبيعات:</strong>
-      <div>عدد العملاء: ${uniqueCustomers}</div>
-      <div>إجمالي المبيعات: ${totalSales.toFixed(2)} ج.م</div>
-      <div>عدد العمليات: ${purchases.length}</div>
-    </div>
-    <table>
-      <tr>
-        <th>رقم العملية</th>
-        <th>العميل</th>
-        <th>المنتج</th>
-        <th>الكمية</th>
-        <th>السعر</th>
-        <th>الإجمالي</th>
-        <th>التاريخ</th>
-        <th>حذف</th>
-      </tr>`;
-    
-    purchases.forEach((p, i) => {
-      html += `<tr>
-        <td>${i+1}</td>
-        <td>${p.name || p.phone}</td>
-        <td>${p.product}</td>
-        <td>${p.qty}</td>
-        <td>${p.price} ج.م</td>
-        <td>${(p.price * p.qty).toFixed(2)} ج.م</td>
-        <td>${p.timestamp}</td>
-        <td><button onclick="deletePurchase(${i})" class="delBtn">🗑️</button></td>
-      </tr>`;
-    });
-    
-    html += `</table>`;
-  } else { 
-    html += "<p>📦 لا توجد مبيعات بعد.</p>"; 
-  }
-  
-  document.getElementById('content').innerHTML = html;
-}
-
-// إدارة السلة
-function renderCartControl(){
-  let html = `<h3>🛒 إدارة سلة التسوق</h3>`;
-  
-  if(cart.length > 0){
-    html += `
-    <table>
-      <tr>
-        <th>الصورة</th>
-        <th>المنتج</th>
-        <th>السعر</th>
-        <th>الكمية</th>
-        <th>الإجمالي</th>
-        <th>إجراءات</th>
-      </tr>`;
-    
-    cart.forEach((item, index) => {
-      html += `
-      <tr>
-        <td><img src="${item.img}" class="img-thumbnail" onerror="this.src='https://via.placeholder.com/50'"></td>
-        <td>${item.name}</td>
-        <td>${item.price} ج.م</td>
-        <td><input type="number" value="${item.quantity}" min="1" id="qty-${index}" style="width:60px;"></td>
-        <td>${(item.price * item.quantity).toFixed(2)} ج.م</td>
-        <td>
-          <button onclick="updateCartItem(${index})" class="action">🔄</button>
-          <button onclick="removeCartItem(${index})" class="delBtn">🗑️</button>
-        </td>
-      </tr>`;
-    });
-    
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    html += `
-      <tr style="font-weight:bold;">
-        <td colspan="4">الإجمالي</td>
-        <td>${total.toFixed(2)} ج.م</td>
-        <td></td>
-      </tr>
-    </table>`;
-  } else {
-    html += "<p>السلة فارغة حالياً</p>";
-  }
-  
-  document.getElementById('content').innerHTML = html;
-}
-
-// تحديث نسبة النقاط
-function updatePointsRate(){
-  let newRate = parseFloat(document.getElementById('pointsRateInput').value);
-  if(isNaN(newRate)) { 
-    alert("❗ أدخل رقم صحيح."); 
-    return; 
-  }
-  
-  pointsRate = newRate;
-  localStorage.setItem('pointsRate', pointsRate);
-  alert("✅ تم تحديث نسبة النقاط.");
-}
-
-// إضافة مدير جديد
-function addAdmin(){
-  let name = document.getElementById('adminName').value.trim();
-  let phone = document.getElementById('adminPhone').value.trim();
-  let pass = document.getElementById('adminPass').value.trim();
-  let code = Math.floor(2000 + Math.random() * 8000);
-  
-  let permissions = {
-    canViewSales: document.getElementById('permViewSales').checked,
-    canDeleteSales: document.getElementById('permDeleteSales').checked
-  };
-  
-  if(!name || !phone || !pass){ 
-    alert("❗ أكمل البيانات."); 
-    return; 
-  }
-  
-  users.push({
-    name,
-    phone,
-    password: pass,
-    code,
-    role: "admin",
-    permissions
-  });
-  
-  localStorage.setItem('users', JSON.stringify(users));
-  alert(`✅ تم إضافة المدير بنجاح بكود: ${code}`);
-  renderDashboard();
-}
-
-// حذف عملية بيع
-function deletePurchase(index){
-  if(confirm("⚠️ هل أنت متأكد من حذف هذه العملية؟")){
-    purchases.splice(index, 1);
-    localStorage.setItem('purchases', JSON.stringify(purchases));
-    renderSales();
-  }
-}
-
-// تحديث عنصر في السلة
-function updateCartItem(index){
-  const newQty = parseInt(document.getElementById(`qty-${index}`).value);
-  if(isNaN(newQty) || newQty < 1){
-    alert("❗ أدخل كمية صحيحة");
-    return;
-  }
-  
-  cart[index].quantity = newQty;
-  localStorage.setItem('cart', JSON.stringify(cart));
-  renderCartControl();
-}
-
-// حذف عنصر من السلة
-function removeCartItem(index){
-  if(confirm("⚠️ هل تريد حذف هذا المنتج من السلة؟")){
-    cart.splice(index, 1);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    renderCartControl();
-  }
-}
-</script>
-
+    <script>
+        // متغيرات التطبيق
+        const app = {
+            currentUser: null,
+            products: [],
+            orders: [],
+            customers: [],
+            settings: {
+                pointsRate: 5
+            },
+            currentTab: 'dashboard'
+        };
+        
+        // عناصر DOM
+        const dom = {
+            content: document.getElementById('content'),
+            tabs: document.getElementById('tabs')
+        };
+        
+        // تهيئة التطبيق
+        function init() {
+            loadData();
+            checkAuth();
+        }
+        
+        // تحميل البيانات من localStorage
+        function loadData() {
+            app.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+            app.products = JSON.parse(localStorage.getItem('products')) || [];
+            app.orders = JSON.parse(localStorage.getItem('orders')) || [];
+            app.customers = JSON.parse(localStorage.getItem('customers')) || [];
+            app.settings = JSON.parse(localStorage.getItem('settings')) || { pointsRate: 5 };
+            
+            // إذا لم يكن هناك بيانات، نقوم بإنشاء بيانات تجريبية
+            if(app.products.length === 0) {
+                createSampleData();
+            }
+            
+            renderCurrentTab();
+        }
+        
+        // حفظ البيانات في localStorage
+        function saveData() {
+            localStorage.setItem('products', JSON.stringify(app.products));
+            localStorage.setItem('orders', JSON.stringify(app.orders));
+            localStorage.setItem('customers', JSON.stringify(app.customers));
+            localStorage.setItem('settings', JSON.stringify(app.settings));
+            localStorage.setItem('currentUser', JSON.stringify(app.currentUser));
+        }
+        
+        // إنشاء بيانات تجريبية
+        function createSampleData() {
+            // منتجات عينة
+            app.products = [
+                { id: 1, name: "تفاح", price: 10, image: "https://via.placeholder.com/100", stock: 50 },
+                { id: 2, name: "موز", price: 8, image: "https://via.placeholder.com/100", stock: 30 },
+                { id: 3, name: "برتقال", price: 12, image: "https://via.placeholder.com/100", stock: 40 }
+            ];
+            
+            // عملاء عينة
+            app.customers = [
+                { id: 1, name: "محمد أحمد", phone: "01012345678", points: 50 },
+                { id: 2, name: "أحمد محمد", phone: "01123456789", points: 30 }
+            ];
+            
+            // طلبات عينة
+            app.orders = [
+                { 
+                    id: 1, 
+                    customerId: 1, 
+                    date: "2023-05-15", 
+                    items: [
+                        { productId: 1, quantity: 2, price: 10 },
+                        { productId: 2, quantity: 3, price: 8 }
+                    ],
+                    total: 44,
+                    status: "مكتمل"
+                },
+                { 
+                    id: 2, 
+                    customerId: 2, 
+                    date: "2023-05-16", 
+                    items: [
+                        { productId: 3, quantity: 5, price: 12 }
+                    ],
+                    total: 60,
+                    status: "قيد التجهيز"
+                }
+            ];
+            
+            // إعدادات افتراضية
+            app.settings = {
+                pointsRate: 5
+            };
+            
+            saveData();
+        }
+        
+        // التحقق من صلاحية المستخدم
+        function checkAuth() {
+            if(!app.currentUser || app.currentUser.role !== "admin") {
+                dom.content.innerHTML = `
+                    <div class="card">
+                        <h2>غير مسموح بالدخول</h2>
+                        <p>ليس لديك صلاحية للوصول إلى لوحة الإدارة</p>
+                        <button onclick="location.href='login.html'" class="btn btn-primary">تسجيل الدخول</button>
+                    </div>
+                `;
+                return false;
+            }
+            return true;
+        }
+        
+        // عرض التبويب الحالي
+        function showTab(tabName) {
+            app.currentTab = tabName;
+            
+            // تحديث التبويبات النشطة
+            const tabs = dom.tabs.querySelectorAll('button');
+            tabs.forEach(tab => {
+                if(tab.getAttribute('onclick').includes(tabName)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            renderCurrentTab();
+        }
+        
+        // عرض محتوى التبويب الحالي
+        function renderCurrentTab() {
+            if(!checkAuth()) return;
+            
+            dom.content.innerHTML = '<div class="loading">جاري تحميل البيانات...</div>';
+            
+            setTimeout(() => {
+                switch(app.currentTab) {
+                    case 'dashboard':
+                        renderDashboard();
+                        break;
+                    case 'products':
+                        renderProducts();
+                        break;
+                    case 'orders':
+                        renderOrders();
+                        break;
+                    case 'customers':
+                        renderCustomers();
+                        break;
+                    case 'settings':
+                        renderSettings();
+                        break;
+                    default:
+                        renderDashboard();
+                }
+            }, 300);
+        }
+        
+        // عرض لوحة التحكم
+        function renderDashboard() {
+            const totalSales = app.orders.reduce((sum, order) => sum + order.total, 0);
+            const totalProducts = app.products.length;
+            const totalCustomers = app.customers.length;
+            const pendingOrders = app.orders.filter(order => order.status !== "مكتمل").length;
+            
+            let html = `
+                <div class="card">
+                    <h2>لوحة التحكم</h2>
+                    <p>مرحباً بك، ${app.currentUser.name}</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-value">${totalSales}</div>
+                            <div class="stat-label">إجمالي المبيعات</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalProducts}</div>
+                            <div class="stat-label">عدد المنتجات</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalCustomers}</div>
+                            <div class="stat-label">عدد العملاء</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${pendingOrders}</div>
+                            <div class="stat-label">طلبات قيد التنفيذ</div>
+                        </div>
+                    </div>
+                    
+                    <h3>آخر الطلبات</h3>
+            `;
+            
+            if(app.orders.length > 0) {
+                const recentOrders = [...app.orders].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                
+                html += `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>العميل</th>
+                                <th>التاريخ</th>
+                                <th>المجموع</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                recentOrders.forEach(order => {
+                    const customer = app.customers.find(c => c.id === order.customerId) || { name: "غير معروف" };
+                    
+                    html += `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>${customer.name}</td>
+                            <td>${order.date}</td>
+                            <td>${order.total} ج.م</td>
+                            <td>${order.status}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `</tbody></table>`;
+            } else {
+                html += '<p>لا توجد طلبات بعد</p>';
+            }
+            
+            html += `</div>`;
+            
+            dom.content.innerHTML = html;
+        }
+        
+        // عرض إدارة المنتجات
+        function renderProducts() {
+            let html = `
+                <div class="card">
+                    <h2>إدارة المنتجات</h2>
+                    <button onclick="showAddProductForm()" class="btn btn-primary">إضافة منتج جديد</button>
+                    
+                    <div id="productsList">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الصورة</th>
+                                    <th>الاسم</th>
+                                    <th>السعر</th>
+                                    <th>المخزون</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            app.products.forEach(product => {
+                html += `
+                    <tr>
+                        <td><img src="${product.image}" class="img-thumbnail" alt="${product.name}"></td>
+                        <td>${product.name}</td>
+                        <td>${product.price} ج.م</td>
+                        <td>${product.stock}</td>
+                        <td>
+                            <button onclick="editProduct(${product.id})" class="btn btn-primary">تعديل</button>
+                            <button onclick="deleteProduct(${product.id})" class="btn btn-danger">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="productFormContainer" style="display:none;"></div>
+            `;
+            
+            dom.content.innerHTML = html;
+        }
+        
+        // عرض إدارة الطلبات
+        function renderOrders() {
+            let html = `
+                <div class="card">
+                    <h2>إدارة الطلبات</h2>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>العميل</th>
+                                <th>التاريخ</th>
+                                <th>المنتجات</th>
+                                <th>المجموع</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            app.orders.forEach(order => {
+                const customer = app.customers.find(c => c.id === order.customerId) || { name: "غير معروف" };
+                const productsList = order.items.map(item => {
+                    const product = app.products.find(p => p.id === item.productId) || { name: "غير معروف" };
+                    return `${product.name} (${item.quantity})`;
+                }).join('، ');
+                
+                html += `
+                    <tr>
+                        <td>${order.id}</td>
+                        <td>${customer.name}</td>
+                        <td>${order.date}</td>
+                        <td>${productsList}</td>
+                        <td>${order.total} ج.م</td>
+                        <td>
+                            <select id="status-${order.id}" onchange="updateOrderStatus(${order.id}, this.value)">
+                                <option value="قيد الانتظار" ${order.status === "قيد الانتظار" ? "selected" : ""}>قيد الانتظار</option>
+                                <option value="قيد التجهيز" ${order.status === "قيد التجهيز" ? "selected" : ""}>قيد التجهيز</option>
+                                <option value="تم الشحن" ${order.status === "تم الشحن" ? "selected" : ""}>تم الشحن</option>
+                                <option value="مكتمل" ${order.status === "مكتمل" ? "selected" : ""}>مكتمل</option>
+                                <option value="ملغي" ${order.status === "ملغي" ? "selected" : ""}>ملغي</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-primary">تفاصيل</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            dom.content.innerHTML = html;
+        }
+        
+        // عرض إدارة العملاء
+        function renderCustomers() {
+            let html = `
+                <div class="card">
+                    <h2>إدارة العملاء</h2>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th>النقاط</th>
+                                <th>عدد الطلبات</th>
+                                <th>إجمالي المشتريات</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            app.customers.forEach(customer => {
+                const customerOrders = app.orders.filter(order => order.customerId === customer.id);
+                const totalSpent = customerOrders.reduce((sum, order) => sum + order.total, 0);
+                
+                html += `
+                    <tr>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.points}</td>
+                        <td>${customerOrders.length}</td>
+                        <td>${totalSpent} ج.م</td>
+                        <td>
+                            <button onclick="viewCustomerDetails(${customer.id})" class="btn btn-primary">تفاصيل</button>
+                            <button onclick="editCustomerPoints(${customer.id})" class="btn btn-success">تعديل النقاط</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            dom.content.innerHTML = html;
+        }
+        
+        // عرض إعدادات النظام
+        function renderSettings() {
+            let html = `
+                <div class="card">
+                    <h2>إعدادات النظام</h2>
+                    
+                    <div class="form-group">
+                        <label>نسبة النقاط من إجمالي المشتريات (%)</label>
+                        <input type="number" id="pointsRate" value="${app.settings.pointsRate}" min="0" max="100" step="0.1">
+                        <small>النسبة المئوية للنقاط التي يحصل عليها العميل من كل عملية شراء</small>
+                    </div>
+                    
+                    <button onclick="saveSettings()" class="btn btn-primary">حفظ الإعدادات</button>
+                    
+                    <h3 style="margin-top: 2rem;">نسخ احتياطي للبيانات</h3>
+                    <button onclick="exportData()" class="btn btn-success">تصدير البيانات</button>
+                    <button onclick="importData()" class="btn btn-primary">استيراد البيانات</button>
+                    
+                    <div id="importExportStatus" style="margin-top: 1rem;"></div>
+                </div>
+            `;
+            
+            dom.content.innerHTML = html;
+        }
+        
+        // حفظ الإعدادات
+        function saveSettings() {
+            const pointsRate = parseFloat(document.getElementById('pointsRate').value);
+            
+            if(isNaN(pointsRate) {
+                showAlert('danger', 'الرجاء إدخال نسبة صحيحة');
+                return;
+            }
+            
+            app.settings.pointsRate = pointsRate;
+            saveData();
+            showAlert('success', 'تم حفظ الإعدادات بنجاح');
+        }
+        
+        // عرض رسالة تنبيه
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.card');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
+        // تصدير البيانات
+        function exportData() {
+            const data = {
+                products: app.products,
+                orders: app.orders,
+                customers: app.customers,
+                settings: app.settings
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'متجر-بيانات-' + new Date().toISOString().slice(0,10) + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            document.getElementById('importExportStatus').innerHTML = `
+                <div class="alert alert-success">تم تصدير البيانات بنجاح</div>
+            `;
+        }
+        
+        // استيراد البيانات
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if(data.products && data.orders && data.customers && data.settings) {
+                            app.products = data.products;
+                            app.orders = data.orders;
+                            app.customers = data.customers;
+                            app.settings = data.settings;
+                            
+                            saveData();
+                            renderCurrentTab();
+                            
+                            document.getElementById('importExportStatus').innerHTML = `
+                                <div class="alert alert-success">تم استيراد البيانات بنجاح</div>
+                            `;
+                        } else {
+                            throw new Error('ملف غير صالح');
+                        }
+                    } catch (error) {
+                        document.getElementById('importExportStatus').innerHTML = `
+                            <div class="alert alert-danger">خطأ في استيراد البيانات: ${error.message}</div>
+                        `;
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // بدء تشغيل التطبيق
+        init();
+    </script>
 </body>
 </html>
