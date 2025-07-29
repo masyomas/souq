@@ -3,81 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المالك</title>
+    <title>لوحة إدارة المتجر</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Tahoma', Arial, sans-serif;
         }
         
         body {
+            font-family: 'Tahoma', Arial, sans-serif;
             background-color: #f5f5f5;
             color: #333;
+            line-height: 1.6;
         }
         
         header {
             background-color: var(--dark);
             color: white;
-            padding: 1.5rem;
+            padding: 1rem;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         nav {
             display: flex;
-            background-color: var(--secondary);
-            overflow-x: auto;
+            background-color: var(--light);
+            border-bottom: 1px solid #ddd;
         }
         
         nav button {
             flex: 1;
-            min-width: 120px;
-            padding: 1rem;
+            padding: 0.75rem;
             border: none;
             background: none;
-            color: white;
             cursor: pointer;
-            transition: all 0.3s;
             font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
         
         nav button:hover {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(0,0,0,0.05);
         }
         
         nav button.active {
             background-color: var(--primary);
+            color: white;
             font-weight: bold;
         }
         
         main {
-            padding: 2rem;
+            padding: 1rem;
             max-width: 1200px;
             margin: 0 auto;
         }
         
         .card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
         
         h2 {
             color: var(--primary);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #eee;
         }
@@ -85,12 +88,11 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
-            font-size: 0.9rem;
+            margin: 1rem 0;
         }
         
         th, td {
-            padding: 1rem;
+            padding: 0.75rem;
             text-align: center;
             border: 1px solid #ddd;
         }
@@ -100,17 +102,19 @@
             font-weight: bold;
         }
         
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
         .btn {
             display: inline-block;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
-            transition: all 0.3s;
-            border: none;
-            font-size: 0.9rem;
-            margin: 0.2rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
         
         .btn-primary {
@@ -128,8 +132,13 @@
             color: white;
         }
         
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         
         label {
@@ -140,25 +149,22 @@
         
         input, select {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.5rem;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
+            border-radius: 4px;
         }
         
         .img-thumbnail {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         
         .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
         }
         
         .alert-success {
@@ -176,53 +182,40 @@
         .loading {
             text-align: center;
             padding: 2rem;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--secondary);
         }
         
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
         
         .stat-card {
             background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
+            border-radius: 5px;
+            padding: 1rem;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 0.5rem;
         }
         
         .stat-label {
             color: var(--secondary);
             font-size: 0.9rem;
         }
-        
-        .owner-badge {
-            background-color: #f39c12;
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1>لوحة تحكم المالك</h1>
-        <p>مرحباً بك، <span class="owner-badge">المالك</span> محمود عادل صالح</p>
+        <h1>لوحة إدارة المتجر الإلكتروني</h1>
     </header>
     
     <nav id="tabs">
@@ -231,7 +224,6 @@
         <button onclick="showTab('orders')">الطلبات</button>
         <button onclick="showTab('customers')">العملاء</button>
         <button onclick="showTab('settings')">الإعدادات</button>
-        <button onclick="logout()" style="color: var(--danger);">تسجيل خروج</button>
     </nav>
     
     <main id="content">
@@ -239,19 +231,9 @@
     </main>
 
     <script>
-        // بيانات التطبيق
+        // متغيرات التطبيق
         const app = {
-            currentUser: {
-                id: 1,
-                name: "محمود عادل صالح",
-                phone: "01552402912",
-                password: "790707071",
-                role: "owner",
-                permissions: {
-                    all: true
-                },
-                createdAt: new Date().toLocaleString('ar-EG')
-            },
+            currentUser: null,
             products: [],
             orders: [],
             customers: [],
@@ -273,48 +255,72 @@
             checkAuth();
         }
         
-        // تحميل البيانات
+        // تحميل البيانات من localStorage
         function loadData() {
-            // تحميل البيانات من localStorage أو إنشاء بيانات أولية
-            const savedData = localStorage.getItem('storeData');
+            app.currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+            app.products = JSON.parse(localStorage.getItem('products')) || [];
+            app.orders = JSON.parse(localStorage.getItem('orders')) || [];
+            app.customers = JSON.parse(localStorage.getItem('customers')) || [];
+            app.settings = JSON.parse(localStorage.getItem('settings')) || { pointsRate: 5 };
             
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                app.products = data.products || [];
-                app.orders = data.orders || [];
-                app.customers = data.customers || [];
-                app.settings = data.settings || { pointsRate: 5 };
-            } else {
+            // إذا لم يكن هناك بيانات، نقوم بإنشاء بيانات تجريبية
+            if(app.products.length === 0) {
                 createSampleData();
             }
             
             renderCurrentTab();
         }
         
-        // حفظ البيانات
+        // حفظ البيانات في localStorage
         function saveData() {
-            const data = {
-                products: app.products,
-                orders: app.orders,
-                customers: app.customers,
-                settings: app.settings
-            };
-            
-            localStorage.setItem('storeData', JSON.stringify(data));
+            localStorage.setItem('products', JSON.stringify(app.products));
+            localStorage.setItem('orders', JSON.stringify(app.orders));
+            localStorage.setItem('customers', JSON.stringify(app.customers));
+            localStorage.setItem('settings', JSON.stringify(app.settings));
+            localStorage.setItem('currentUser', JSON.stringify(app.currentUser));
         }
         
-        // إنشاء بيانات أولية
+        // إنشاء بيانات تجريبية
         function createSampleData() {
+            // منتجات عينة
             app.products = [
-                { id: 1, name: "تفاح", price: 10, image: "https://via.placeholder.com/100?text=تفاح", stock: 50 },
-                { id: 2, name: "موز", price: 8, image: "https://via.placeholder.com/100?text=موز", stock: 30 },
-                { id: 3, name: "برتقال", price: 12, image: "https://via.placeholder.com/100?text=برتقال", stock: 40 }
+                { id: 1, name: "تفاح", price: 10, image: "https://via.placeholder.com/100", stock: 50 },
+                { id: 2, name: "موز", price: 8, image: "https://via.placeholder.com/100", stock: 30 },
+                { id: 3, name: "برتقال", price: 12, image: "https://via.placeholder.com/100", stock: 40 }
             ];
             
-            app.customers = [];
+            // عملاء عينة
+            app.customers = [
+                { id: 1, name: "محمد أحمد", phone: "01012345678", points: 50 },
+                { id: 2, name: "أحمد محمد", phone: "01123456789", points: 30 }
+            ];
             
-            app.orders = [];
+            // طلبات عينة
+            app.orders = [
+                { 
+                    id: 1, 
+                    customerId: 1, 
+                    date: "2023-05-15", 
+                    items: [
+                        { productId: 1, quantity: 2, price: 10 },
+                        { productId: 2, quantity: 3, price: 8 }
+                    ],
+                    total: 44,
+                    status: "مكتمل"
+                },
+                { 
+                    id: 2, 
+                    customerId: 2, 
+                    date: "2023-05-16", 
+                    items: [
+                        { productId: 3, quantity: 5, price: 12 }
+                    ],
+                    total: 60,
+                    status: "قيد التجهيز"
+                }
+            ];
             
+            // إعدادات افتراضية
             app.settings = {
                 pointsRate: 5
             };
@@ -322,18 +328,19 @@
             saveData();
         }
         
-        // التحقق من الصلاحيات
+        // التحقق من صلاحية المستخدم
         function checkAuth() {
-            // في تطبيق حقيقي، نتحقق من تسجيل الدخول هنا
-            renderCurrentTab();
-        }
-        
-        // تسجيل الخروج
-        function logout() {
-            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-                localStorage.removeItem('currentUser');
-                window.location.href = "login.html";
+            if(!app.currentUser || app.currentUser.role !== "admin") {
+                dom.content.innerHTML = `
+                    <div class="card">
+                        <h2>غير مسموح بالدخول</h2>
+                        <p>ليس لديك صلاحية للوصول إلى لوحة الإدارة</p>
+                        <button onclick="location.href='login.html'" class="btn btn-primary">تسجيل الدخول</button>
+                    </div>
+                `;
+                return false;
             }
+            return true;
         }
         
         // عرض التبويب الحالي
@@ -343,7 +350,7 @@
             // تحديث التبويبات النشطة
             const tabs = dom.tabs.querySelectorAll('button');
             tabs.forEach(tab => {
-                if (tab.getAttribute('onclick')?.includes(tabName)) {
+                if(tab.getAttribute('onclick').includes(tabName)) {
                     tab.classList.add('active');
                 } else {
                     tab.classList.remove('active');
@@ -355,6 +362,8 @@
         
         // عرض محتوى التبويب الحالي
         function renderCurrentTab() {
+            if(!checkAuth()) return;
+            
             dom.content.innerHTML = '<div class="loading">جاري تحميل البيانات...</div>';
             
             setTimeout(() => {
@@ -390,10 +399,11 @@
             let html = `
                 <div class="card">
                     <h2>لوحة التحكم</h2>
+                    <p>مرحباً بك، ${app.currentUser.name}</p>
                     
                     <div class="stats-container">
                         <div class="stat-card">
-                            <div class="stat-value">${totalSales} ج.م</div>
+                            <div class="stat-value">${totalSales}</div>
                             <div class="stat-label">إجمالي المبيعات</div>
                         </div>
                         <div class="stat-card">
@@ -413,35 +423,33 @@
                     <h3>آخر الطلبات</h3>
             `;
             
-            if (app.orders.length > 0) {
-                const recentOrders = [...app.orders]
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .slice(0, 5);
+            if(app.orders.length > 0) {
+                const recentOrders = [...app.orders].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
                 
                 html += `
                     <table>
                         <thead>
                             <tr>
                                 <th>رقم الطلب</th>
+                                <th>العميل</th>
                                 <th>التاريخ</th>
                                 <th>المجموع</th>
                                 <th>الحالة</th>
-                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 
                 recentOrders.forEach(order => {
+                    const customer = app.customers.find(c => c.id === order.customerId) || { name: "غير معروف" };
+                    
                     html += `
                         <tr>
                             <td>${order.id}</td>
+                            <td>${customer.name}</td>
                             <td>${order.date}</td>
                             <td>${order.total} ج.م</td>
                             <td>${order.status}</td>
-                            <td>
-                                <button onclick="viewOrder(${order.id})" class="btn btn-primary">عرض</button>
-                            </td>
                         </tr>
                     `;
                 });
@@ -516,6 +524,7 @@
                                 <th>رقم الطلب</th>
                                 <th>العميل</th>
                                 <th>التاريخ</th>
+                                <th>المنتجات</th>
                                 <th>المجموع</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
@@ -525,13 +534,18 @@
             `;
             
             app.orders.forEach(order => {
-                const customer = app.customers.find(c => c.id === order.customerId) || { name: "زائر" };
+                const customer = app.customers.find(c => c.id === order.customerId) || { name: "غير معروف" };
+                const productsList = order.items.map(item => {
+                    const product = app.products.find(p => p.id === item.productId) || { name: "غير معروف" };
+                    return `${product.name} (${item.quantity})`;
+                }).join('، ');
                 
                 html += `
                     <tr>
                         <td>${order.id}</td>
                         <td>${customer.name}</td>
                         <td>${order.date}</td>
+                        <td>${productsList}</td>
                         <td>${order.total} ج.م</td>
                         <td>
                             <select id="status-${order.id}" onchange="updateOrderStatus(${order.id}, this.value)">
@@ -543,7 +557,7 @@
                             </select>
                         </td>
                         <td>
-                            <button onclick="viewOrder(${order.id})" class="btn btn-primary">تفاصيل</button>
+                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-primary">تفاصيل</button>
                         </td>
                     </tr>
                 `;
@@ -586,11 +600,12 @@
                     <tr>
                         <td>${customer.name}</td>
                         <td>${customer.phone}</td>
-                        <td>${customer.points || 0}</td>
+                        <td>${customer.points}</td>
                         <td>${customerOrders.length}</td>
                         <td>${totalSpent} ج.م</td>
                         <td>
-                            <button onclick="viewCustomer(${customer.id})" class="btn btn-primary">تفاصيل</button>
+                            <button onclick="viewCustomerDetails(${customer.id})" class="btn btn-primary">تفاصيل</button>
+                            <button onclick="editCustomerPoints(${customer.id})" class="btn btn-success">تعديل النقاط</button>
                         </td>
                     </tr>
                 `;
@@ -605,7 +620,7 @@
             dom.content.innerHTML = html;
         }
         
-        // عرض الإعدادات
+        // عرض إعدادات النظام
         function renderSettings() {
             let html = `
                 <div class="card">
@@ -619,11 +634,11 @@
                     
                     <button onclick="saveSettings()" class="btn btn-primary">حفظ الإعدادات</button>
                     
-                    <h3 style="margin-top: 2rem;">إدارة البيانات</h3>
+                    <h3 style="margin-top: 2rem;">نسخ احتياطي للبيانات</h3>
                     <button onclick="exportData()" class="btn btn-success">تصدير البيانات</button>
                     <button onclick="importData()" class="btn btn-primary">استيراد البيانات</button>
                     
-                    <div id="dataStatus" style="margin-top: 1rem;"></div>
+                    <div id="importExportStatus" style="margin-top: 1rem;"></div>
                 </div>
             `;
             
@@ -634,8 +649,8 @@
         function saveSettings() {
             const pointsRate = parseFloat(document.getElementById('pointsRate').value);
             
-            if (isNaN(pointsRate) || pointsRate < 0 || pointsRate > 100) {
-                showAlert('danger', 'الرجاء إدخال نسبة صحيحة بين 0 و 100');
+            if(isNaN(pointsRate) {
+                showAlert('danger', 'الرجاء إدخال نسبة صحيحة');
                 return;
             }
             
@@ -644,26 +659,42 @@
             showAlert('success', 'تم حفظ الإعدادات بنجاح');
         }
         
+        // عرض رسالة تنبيه
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.card');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
         // تصدير البيانات
         function exportData() {
             const data = {
                 products: app.products,
                 orders: app.orders,
                 customers: app.customers,
-                settings: app.settings,
-                exportedAt: new Date().toLocaleString('ar-EG')
+                settings: app.settings
             };
             
             const dataStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `نسخة-احتياطية-متجر-${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
+            const exportFileDefaultName = 'متجر-بيانات-' + new Date().toISOString().slice(0,10) + '.json';
             
-            showAlert('success', 'تم تصدير البيانات بنجاح');
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            document.getElementById('importExportStatus').innerHTML = `
+                <div class="alert alert-success">تم تصدير البيانات بنجاح</div>
+            `;
         }
         
         // استيراد البيانات
@@ -680,23 +711,25 @@
                     try {
                         const data = JSON.parse(event.target.result);
                         
-                        if (confirm("هل أنت متأكد من استيراد البيانات؟ سيتم استبدال جميع البيانات الحالية!")) {
-                            if (data.products && data.orders && data.customers && data.settings) {
-                                app.products = data.products;
-                                app.orders = data.orders;
-                                app.customers = data.customers;
-                                app.settings = data.settings;
-                                
-                                saveData();
-                                renderCurrentTab();
-                                
-                                showAlert('success', 'تم استيراد البيانات بنجاح');
-                            } else {
-                                throw new Error('ملف البيانات غير صالح');
-                            }
+                        if(data.products && data.orders && data.customers && data.settings) {
+                            app.products = data.products;
+                            app.orders = data.orders;
+                            app.customers = data.customers;
+                            app.settings = data.settings;
+                            
+                            saveData();
+                            renderCurrentTab();
+                            
+                            document.getElementById('importExportStatus').innerHTML = `
+                                <div class="alert alert-success">تم استيراد البيانات بنجاح</div>
+                            `;
+                        } else {
+                            throw new Error('ملف غير صالح');
                         }
                     } catch (error) {
-                        showAlert('danger', `خطأ في استيراد البيانات: ${error.message}`);
+                        document.getElementById('importExportStatus').innerHTML = `
+                            <div class="alert alert-danger">خطأ في استيراد البيانات: ${error.message}</div>
+                        `;
                     }
                 };
                 
@@ -706,32 +739,8 @@
             input.click();
         }
         
-        // عرض رسالة تنبيه
-        function showAlert(type, message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            
-            const container = document.querySelector('.card');
-            if (container) {
-                container.insertBefore(alertDiv, container.firstChild);
-                
-                setTimeout(() => {
-                    alertDiv.remove();
-                }, 5000);
-            }
-        }
-        
         // بدء تشغيل التطبيق
         init();
-        
-        // يمكنك إضافة الدوال الأخرى هنا مثل:
-        // - viewOrder()
-        // - editProduct()
-        // - deleteProduct()
-        // - showAddProductForm()
-        // - viewCustomer()
-        // - updateOrderStatus()
     </script>
 </body>
 </html>
